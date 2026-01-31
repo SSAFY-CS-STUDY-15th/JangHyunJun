@@ -1,12 +1,10 @@
 ## **1. 권장되지 않는 자료구조, Stack**
 
-![https://icandooit.tistory.com/63](assets/StackvsArrayDeque-0.png)
-
-사진 출처 : https://icandooit.tistory.com/63
+<img src="assets/StackvsArrayDeque-0.png" alt="https://icandooit.tistory.com/63" width="500"/>
 
 알고리즘 문제에서 스택이 필요할 때 Stack을 쓰면 되지만, Java에서는 보통 ArrayDeque가 더 빠릅니다. 이는 Stack이 내부적으로 **Vector의 동기화(synchronized) 설계**를 그대로 물려받았기 때문입니다. 알고리즘 풀이는 대부분 단일 스레드에서 돌기 때문에 이 동기화 비용은 굳이 안 써도 되는 비용이고, 누적되면 성능 차이가 체감되기 시작합니다.
 
-![스크린샷 2026-01-29 오전 10.11.58.png](assets/StackvsArrayDeque-1.png)
+<img src="assets/StackvsArrayDeque-1.png" width="600"/>
 
 실제로 Java 공식문서나 Stack의 내부 코드를 들어가보면 LIFO stack을 위해 ArrayDeque를 사용하는 것을 권장하고 있는 것을 볼 수 있습니다.
 
@@ -18,13 +16,13 @@
 
 Vector는 Java 초기(1.0) 시절, 동적 배열을 표준으로 제공하기 위해 만들어졌습니다. 지금 관점에서 보면 ArrayList가 그 역할을 더 자연스럽게 하지만, 당시 설계자들은 "모든 컬렉션은 멀티스레드 환경에서 안전해야 한다"는 철학을 가지고 있었고, 이를 위해 모든 주요 메서드에 `synchronized` 키워드를 붙였습니다.
 
-ArrayList의 add
+**ArrayList의 add**
 
-![ArrayList의 add](assets/StackvsArrayDeque-2.png)
+<img src="assets/StackvsArrayDeque-2.png" alt="ArrayList의 add" width="400"/>
 
-Vector의 add
+**Vector의 add**
 
-![Vector의 add](assets/StackvsArrayDeque-3.png)
+<img src="assets/StackvsArrayDeque-3.png" alt="Vector의 add" width="400"/>
 
 
 ## **3. synchronized 키워드가 뭘까?**
@@ -33,9 +31,7 @@ Vector의 add
 
 ### 자바의 락과 모니터 개념
 
-![https://tecoble.techcourse.co.kr/post/2021-10-23-java-synchronize/](assets/StackvsArrayDeque-4.png)
-
-사진 출처 : https://tecoble.techcourse.co.kr/post/2021-10-23-java-synchronize/
+<img src="assets/StackvsArrayDeque-4.png" alt="https://tecoble.techcourse.co.kr/post/2021-10-23-java-synchronize/" width="600"/>
 
 자바의 synchronized는 “객체 단위”로 동기화를 겁니다. 따라서, 모든 객체는 모니터 락을 통해 보호될 수 있는 모델입니다.
 
@@ -47,7 +43,7 @@ Vector의 add
 
 ### synchronized 흐름도
 
-![스크린샷 2026-01-29 오전 11.08.35.png](assets/StackvsArrayDeque-5.png)
+<img src="assets/StackvsArrayDeque-5.png" width="550"/>
 
 1. Thread 1이 객체 A의 synchronized 영역에 진입
     - 객체 A의 모니터 락을 획득 (monitorenter)
@@ -82,7 +78,7 @@ Java의 Stack 구현체는 이름만 스택이지, 사실상 구현은 “Vector
 
 즉, 모든 메서드에서 Vector 메서드를 호출하기 때문에 `synchronized` 키워드가 달려있습니다!
 
-![image.png](assets/StackvsArrayDeque-6.png)
+<img src="assets/StackvsArrayDeque-6.png" alt="Stack 동기화 구조" width="600"/>
 
 따라서, 위 그림처럼 Stack에는 하나의 Thread 밖에 접근하지 못하고 나머지 Thread들은 Stack 접근을 위해 Blocked 상태로 대기해야 합니다.
 
@@ -139,7 +135,7 @@ public class SynchronizationTest {
 }
 ```
 
-![스크린샷 2026-01-29 오후 4.23.43.png](assets/StackvsArrayDeque-7.png)
+<img src="assets/StackvsArrayDeque-7.png" alt="Synchronization Test 결과" width="550"/>
 
 결과적으로, Stack은 동기화 덕분에 정확한 크기를 유지하지만, ArrayDeque는 여러 스레드가 동시에 인덱스를 수정하며 데이터 유실(Race Condition)이 발생합니다.
 
@@ -147,9 +143,7 @@ public class SynchronizationTest {
 
 ArrayDeque의 최종 크기가 작은 이유는 Race Codition의 대표 문제 중 하나인 중복 쓰기가 일어났기 때문입니다.
 
-![[https://velog.io/@yarogono/CS-Race-condition이란](https://velog.io/@yarogono/CS-Race-condition%EC%9D%B4%EB%9E%80)](assets/StackvsArrayDeque-8.png)
-
-사진 출처 : [https://velog.io/@yarogono/CS-Race-condition이란](https://velog.io/@yarogono/CS-Race-condition%EC%9D%B4%EB%9E%80)
+<img src="assets/StackvsArrayDeque-8.png" alt="https://velog.io/@yarogono/CS-Race-condition이란" width="600"/>
 
 위 사진과 같이 두 스레드가 하나의 임계 영역에 접근하려고 할 때, 쓰기 작업이 겹치게 되면서 하나의 스레드가 write한 작업은 유실되어 버리는 것입니다.
 
@@ -193,7 +187,7 @@ public class PerformanceTest {
 }
 ```
 
-![스크린샷 2026-01-30 오후 3.23.40.png](assets/StackvsArrayDeque-9.png)
+<img src="assets/StackvsArrayDeque-9.png" alt="Performance Test 결과" width="550"/>
 
 큰 차이가 안 날줄 알았는데 거의 2배 차이가 난다. 이로써 알고리즘 문제와 같은 동기화가 굳이 필요하지 않은 상황에는 ArrayDeque를 사용하는 것이 유리하다는걸 알 수 있습니다.
 
@@ -201,7 +195,7 @@ public class PerformanceTest {
 
 ## 6. ArrayDeque를 동기화하고 싶다면? (대안과 한계)
 
-ArrayDeque는 성능이 뛰어나지만 스레드 안전하지 않다는 단점이 있습니다. 만약 멀티스레드 환경에서 Stack의 대안으로 ArrayDeque만큼의 성능을 내면서 동기화까지 확보하고 싶다면, 보통 java.util.concurrent 패키지의 **`ConcurrentLinkedDeque`**를 대안으로 떠올리게 됩니다.
+ArrayDeque는 성능이 뛰어나지만 스레드 안전하지 않다는 단점이 있습니다. 만약 멀티스레드 환경에서 Stack의 대안으로 ArrayDeque만큼의 성능을 내면서 동기화까지 확보하고 싶다면, 보통 java.util.concurrent 패키지의 `ConcurrentLinkedDeque`를 대안으로 떠올리게 됩니다.
 
 ```java
 Deque<Integer> concurrentDeque = new ConcurrentLinkedDeque<>();
@@ -212,9 +206,9 @@ Deque<Integer> concurrentDeque = new ConcurrentLinkedDeque<>();
 - **특징:** synchronized 대신 **CAS(Compare-And-Swap) 알고리즘**을 사용하여 락 프리(Lock-free) 방식으로 동작합니다.
 - **기대 효과:** 여러 스레드가 동시에 접근해도 락을 획득하기 위해 대기(Blocked)하는 시간이 없으므로, Stack보다 훨씬 빠른 처리량을 보일 것이라고 예상했습니다.
 
-[!INFO] **CAS (Compare-And-Swap)** </br> ![image.png](assets/StackvsArrayDeque-10.png) </br> 메모리의 값과 기존 값을 비교하여 일치할 때만 새 값으로 교체하는 원자적 연산입니다. 락을 사용하지 않고도 데이터 일관성을 보장하는 현대적인 동기화 기법입니다.
-
-> 저는 Lock & Monitor 방식을 비관락, CAS 방식을 낙관락과 비슷한 원리라고 생각하니 이해가 쉬웠습니다.
+> [!NOTE] **CAS (Compare-And-Swap)**
+> </br> <img src="assets/StackvsArrayDeque-10.png" alt="CAS 설명" width="400"/> </br> 메모리의 값과 기존 값을 비교하여 일치할 때만 새 값으로 교체하는 원자적 연산입니다. 락을 사용하지 않고도 데이터 일관성을 보장하는 현대적인 동기화 기법입니다.
+> > 저는 Lock & Monitor 방식을 비관락, CAS 방식을 낙관락과 비슷한 원리라고 생각하니 이해가 쉬웠습니다.
 
 ### 실제 성능 측정 결과
 
@@ -259,7 +253,7 @@ public class PerformanceTest {
 }
 ```
 
-![스크린샷 2026-01-30 오후 4.36.20.png](assets/StackvsArrayDeque-11.png)
+<img src="assets/StackvsArrayDeque-11.png" alt="Performance Test 결과" width="550"/>
 
 **[멀티 스레드 환경]**
 
@@ -306,7 +300,7 @@ public class PerformanceTest {
 }
 ```
 
-![스크린샷 2026-01-30 오후 4.23.48.png](assets/StackvsArrayDeque-12.png)
+<img src="assets/StackvsArrayDeque-12.png" alt="Performance Test 결과" width="550"/>
 
 | 자료구조 | 내부 구현 구조 | 싱글 스레드 환경 | 멀티 스레드 환경 |
 | --- | --- | --- | --- |
@@ -332,3 +326,11 @@ public class PerformanceTest {
 - **단일 스레드 환경(알고리즘 문제 풀이)**: ArrayDeque를 사용하는 것이 가장 합리적입니다. 동기화 비용이 없고, 배열 기반이라 캐시 효율이 좋아 빠르게 동작합니다.
 - **멀티 스레드 환경(단순 LIFO 작업)**: 공유 스택이 꼭 필요하고 구현 단순성이 중요하다면 Stack도 선택지가 될 수 있습니다. 다만 Stack은 Vector 기반의 동기화로 인해 경쟁이 커질수록 급격히 느려질 수 있고, Vector 상속으로 인해 스택 의미와 무관한 API가 노출되는 점도 유의해야 합니다.
 - **동시성 요구가 강한 병렬 처리 환경(블로킹 회피가 핵심인 경우)**: ConcurrentLinkedDeque는 양쪽 끝에서의 삽입/삭제가 동시에 빈번하게 발생하면서, 락 기반 동기화로 인한 스레드 블로킹(대기 상태 진입)을 가능한 한 피해야 하는 상황에서 고려할 수 있습니다. 특히 실시간성 또는 지연 변동(락 대기)에 민감한 경로에서, 락 대신 CAS 기반의 비차단 진행 특성이 유리하게 작용할 수 있습니다.
+
+
+### 사진 출처 및 레퍼런스 
+- https://icandooit.tistory.com/63
+- https://tecoble.techcourse.co.kr/post/2021-10-23-java-synchronize/
+- https://velog.io/@yarogono/CS-Race-condition%EC%9D%B4%EB%9E%80
+- https://inpa.tistory.com/entry/JCF-%F0%9F%A7%B1-ArrayList-vs-Vector-%EB%8F%99%EA%B8%B0%ED%99%94-%EC%B0%A8%EC%9D%B4-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0?pidx=6
+- https://vanslog.io/posts/language/java/why-use-deque-instead-of-stack/
