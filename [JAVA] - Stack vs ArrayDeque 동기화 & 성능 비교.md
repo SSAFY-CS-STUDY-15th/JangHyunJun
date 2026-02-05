@@ -206,7 +206,8 @@ Deque<Integer> concurrentDeque = new ConcurrentLinkedDeque<>();
 - **특징:** synchronized 대신 **CAS(Compare-And-Swap) 알고리즘**을 사용하여 락 프리(Lock-free) 방식으로 동작합니다.
 - **기대 효과:** 여러 스레드가 동시에 접근해도 락을 획득하기 위해 대기(Blocked)하는 시간이 없으므로, Stack보다 훨씬 빠른 처리량을 보일 것이라고 예상했습니다.
 
-> [!NOTE] **CAS (Compare-And-Swap)**
+> [!NOTE]
+> **CAS (Compare-And-Swap)**
 > </br> <img src="assets/StackvsArrayDeque-10.png" alt="CAS 설명" width="400"/> </br> 메모리의 값과 기존 값을 비교하여 일치할 때만 새 값으로 교체하는 원자적 연산입니다. 락을 사용하지 않고도 데이터 일관성을 보장하는 현대적인 동기화 기법입니다.
 > > 저는 Lock & Monitor 방식을 비관락, CAS 방식을 낙관락과 비슷한 원리라고 생각하니 이해가 쉬웠습니다.
 
@@ -340,7 +341,7 @@ Java의 `synchronized` 키워드를 사용한 동기화는 기본적으로 **비
 
 1. **Entry Set (Wait Set) 진입**: 특정 객체의 락이 이미 점유된 상태에서 다른 스레드가 `synchronized` 블록에 접근하면, 해당 스레드들은 `Blocked` 상태가 되어 객체의 **Entry Set**에서 대기합니다.
 2. **락 해제 및 경쟁**: 락을 가진 스레드가 작업을 마치고 락을 반납(`monitorexit`)하면, Entry Set에 대기 중이던 스레드들이 다시 락을 얻기 위해 경쟁합니다.
-3. **무작위성**: 이때 JVM은 대기 중인 스레드 중 어떤 스레드가 락을 가져갈지 보장하지 않습니다. 운이 좋은 스레드가 락을 가로챌 수 있으며, 먼저 기다리던 스레드가 계속해서 뒤처지는 **기아 상태(Starvation)**가 발생할 수도 있습니다.
+3. **무작위성**: 이때 JVM은 대기 중인 스레드 중 어떤 스레드가 락을 가져갈지 보장하지 않습니다. 운이 좋은 스레드가 락을 가로챌 수 있으며, 먼저 기다리던 스레드가 계속해서 뒤처지는 기아 상태(Starvation)가 발생할 수도 있습니다.
 
 **[공정한 동기화가 필요한 경우: ReentrantLock]**
 
